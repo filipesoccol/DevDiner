@@ -1,14 +1,15 @@
 import { StateMachine } from "@stackr/sdk/machine";
-
 import * as genesisState from "../../genesis-state.json";
-import { CounterState } from "./state";
+import { DevDinerState } from "./state";
 import { transitions } from "./transitions";
 
+const APPID = 'dev-diner'
+
 const machine = new StateMachine({
-  id: "counter",
-  stateClass: CounterState,
-  initialState: genesisState.state,
+  id: APPID,
+  stateClass: DevDinerState,
+  initialState: genesisState,
   on: transitions,
 });
 
-export { machine };
+export { machine, APPID };

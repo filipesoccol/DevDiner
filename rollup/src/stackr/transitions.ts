@@ -1,7 +1,7 @@
 import { STF, Transitions } from "@stackr/sdk/machine";
-import { CounterState } from "./state";
+import { DevDinerState } from "./state";
 
-const increment: STF<CounterState> = {
+const increment: STF<DevDinerState> = {
   handler: ({ state, emit }) => {
     state += 1;
     emit({ name: "ValueAfterIncrement", value: state });
@@ -9,7 +9,7 @@ const increment: STF<CounterState> = {
   },
 };
 
-const decrement: STF<CounterState> = {
+const decrement: STF<DevDinerState> = {
   handler: ({ state, emit }) => {
     state -= 1;
     emit({ name: "ValueAfterDecrement", value: state });
@@ -17,7 +17,7 @@ const decrement: STF<CounterState> = {
   },
 };
 
-export const transitions: Transitions<CounterState> = {
+export const transitions: Transitions<DevDinerState> = {
   increment,
   decrement,
 };

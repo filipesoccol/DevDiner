@@ -1,6 +1,6 @@
 # DevDiner
 
-A project to serve a pooling application for collecting developers data related to their diets. This is important to track that data to serve different meal options during in-person events.
+A project to provide a survey application for collecting developers data related to their diets. This is important to track that data to serve different meal options during in-person events.
 
 The stack includes Web3Auth for wallet authentication, XMTP tools for users to sign their submissions on Frames and a Micro-rollup backend using Stackr.
 
@@ -34,6 +34,8 @@ If everything is set and ready just run de micro-rollup using Bun:
 bun start
 ```
 
+You can test your rollup in this [playground](https://playground.stf.xyz/)
+
 ## Running the app itself
 
 ```sh
@@ -53,3 +55,5 @@ Inside developer tool head to http://localhost:3000/api
 ## Navigating the app
 
 To see the default page where you can register events please navigate to the default page http://localhost:3000.
+
+## References:
