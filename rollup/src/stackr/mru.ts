@@ -5,6 +5,7 @@ import { CreateEvent, SetMyRestrictions, UpdateEvent } from "./schemas";
 import { Playground } from "@stackr/sdk/plugins";
 import express, { Request, Response } from "express";
 
+
 // INITIALIZING EXPRESS
 const app = express();
 app.use(express.json());
@@ -16,30 +17,40 @@ const mru = await MicroRollup({
   stateMachines: [machine]
 });
 
-type SurveyMachine = typeof machine;
+type DevDiner = typeof machine;
 await mru.init();
+const { actions, chain, events } = mru;
+const state = mru.stateMachines.get<DevDiner>(APPID);
 
 // ADDING PLAYGROUND FUNCTIONS
 if (process.env.NODE_ENV === "development") {
   const playground = Playground.init(mru);
 
   playground.addGetMethod(
-    "/custom/hello",
+    "/custom/developers",
     async (_req: Request, res: Response) => {
-      res.json({
-        message: "Hello from the custom route",
-      });
+      return res.send(state?.state.developers);
+    }
+  );
+
+  playground.addGetMethod(
+    "/custom/events",
+    async (_req: Request, res: Response) => {
+      return res.send(state?.state.events);
     }
   );
 }
 
-const { actions, chain, events } = mru;
-const state = mru.stateMachines.get<SurveyMachine>(APPID);
-
-app.get("/event/:hash", async (req: Request, res: Response) => {
+// Adding Real functions
+app.get("/root-hash", async (req: Request, res: Response) => {
   const { hash } = req.params;
-  const event = state?.events.find((e) => e.fid === Number(fid));
-  return res.send({ userScore });
+  // const event = state?.events.find((e) => e.fid === Number(fid));
+  const root = state?.stateRootHash;
+  return res.send({ root });
+});
+
+app.listen(5050, () => {
+  console.log("listening on port 5050");
 });
 
 export { mru };

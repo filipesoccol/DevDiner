@@ -1,5 +1,6 @@
 import { ActionSchema, AllowedInputTypes } from "@stackr/sdk";
 import { HDNodeWallet } from "ethers";
+import { SetMyRestrictions } from "./stackr/schemas.ts";
 
 export const signMessage = async (
   wallet: HDNodeWallet,

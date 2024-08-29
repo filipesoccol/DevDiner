@@ -3,15 +3,14 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "bun run src/stackr/mru.ts",
+    "start": "bun run src/index.ts",
     "test": "mocha --require ts-node/register src/**/*.test.ts"
   },
   "dependencies": {
     "@stackr/sdk": "latest",
     "ethers": "^6.7.1",
     "express": "^4.19.2",
-    "merkletreejs": "^0.3.11",
-    "sqlite3": "^5.1.7"
+    "merkletreejs": "^0.3.11"
   },
   "devDependencies": {
     "@types/chai": "^4.3.13",

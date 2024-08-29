@@ -1,8 +1,7 @@
 import { ActionSchema, SolidityType } from "@stackr/sdk";
 
-export const SetMyRestrictions = new ActionSchema("set-my-restrictions", {
+export const SetMyRestrictions = new ActionSchema("setMyRestrictions", {
   restrictions: SolidityType.UINT,
-  timestamp: SolidityType.UINT,
 });
 
 export const CreateEvent = new ActionSchema("create-event", {

@@ -1,5 +1,6 @@
 import { State } from "@stackr/sdk/machine";
-import { solidityPackedKeccak256 } from "ethers";
+import { hexlify, keccak256, solidityPackedKeccak256, ZeroHash } from "ethers";
+import { MerkleTree } from "merkletreejs";
 
 export enum Restrictions {
   GLUTEN_FREE = 0b1,
@@ -11,41 +12,111 @@ export enum Restrictions {
   FODMAPS = 0b1 << 6,
 }
 
-export type Event = {
-  id: number;
-  name: string;
-  modifiedAt: number;
-  startAt: number;
-  endAt: number;
-  participants: string[];
-};
-
 export type Developer = {
   address: string;
   modifiedAt: number;
   restrictions: number;
 };
 
-export type BaseState = {
+export type Event = {
+  id: number;
+  name: string;
+  modifiedAt: number;
+  startAt: number;
+  endAt: number;
+  participants: string;
+};
+
+export type DevDiner = {
   developers: Developer[];
   events: Event[];
+};
+
+class DevDinerWrapper {
+  public merkletreeDevelopers: MerkleTree;
+  public merkletreeEvents: MerkleTree;
+
+  public events: Event[];
+  public developers: Developer[];
+
+  constructor(developers: Developer[], events: Event[]) {
+    let { merkletreeDevelopers, merkletreeEvents } = this.createTree(
+      developers,
+      events
+    );
+
+    this.merkletreeDevelopers = merkletreeDevelopers;
+    this.merkletreeEvents = merkletreeEvents;
+
+    this.events = events;
+    this.developers = developers;
+  }
+
+  createTree(developers: Developer[], events: Event[]) {
+    const hashedLeavesDevelopers = developers.map((leaf: Developer) => {
+      return solidityPackedKeccak256(
+        ["address", "uint256", "uint256"],
+        [leaf.address, leaf.modifiedAt, leaf.restrictions]
+      );
+    });
+
+    let merkletreeDevelopers = new MerkleTree(
+      hashedLeavesDevelopers,
+      solidityPackedKeccak256
+    );
+
+    const hashedLeavesEvents = events.map((leaf: Event) => {
+      return solidityPackedKeccak256(
+        ["uint256", "string", "uint256", "uint256", "uint256", "bytes32"],
+        [leaf.id, leaf.name, leaf.modifiedAt, leaf.startAt, leaf.endAt, leaf.participants]
+      );
+    });
+
+    let merkletreeEvents = new MerkleTree(
+      hashedLeavesEvents,
+      solidityPackedKeccak256
+    );
+
+    return { merkletreeDevelopers, merkletreeEvents };
+  }
 }
 
-export class DevDinerState extends State<BaseState> {
-  constructor(state: BaseState) {
+export class DevDinerState extends State<DevDiner, DevDinerWrapper> {
+  constructor(state: DevDiner) {
     super(state);
   }
 
-  // Here since the state is simple and doesn't need wrapping, we skip the transformers to wrap and unwrap the state
-
-  // transformer() {
-  //   return {
-  //     wrap: () => this.state,
-  //     unwrap: (wrappedState: number) => wrappedState,
-  //   };
-  // }
+  transformer(): {
+    wrap: () => DevDinerWrapper;
+    unwrap: (wrappedState: DevDinerWrapper) => DevDiner;
+  } {
+    return {
+      wrap: () => {
+        return new DevDinerWrapper(
+          this.state.developers,
+          this.state.events
+        );
+      },
+      unwrap: (wrappedState: DevDinerWrapper) => {
+        return {
+          developers: wrappedState.developers,
+          events: wrappedState.events,
+        };
+      },
+    };
+  }
 
   getRootHash() {
-    return solidityPackedKeccak256(["uint256"], [this.state]);
+    // if (this.state.developers.length === 0 && this.state.events.length === 0) {
+    //   return ZeroHash;
+    // }
+    // return new MerkleTreeWrapper(this.state).merkleTree.getRoot();
+    return solidityPackedKeccak256(
+      ["bytes", "bytes"],
+      [
+        this.transformer().wrap().merkletreeDevelopers.getHexRoot(),
+        this.transformer().wrap().merkletreeEvents.getHexRoot(),
+      ]
+    );
   }
 }

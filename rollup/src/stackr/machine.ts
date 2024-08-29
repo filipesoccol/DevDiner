@@ -4,6 +4,7 @@ import { DevDinerState } from "./state";
 import { transitions } from "./transitions";
 
 const APPID = 'dev-diner'
+console.log('TRANSITIONS', transitions)
 
 const machine = new StateMachine({
   id: APPID,
