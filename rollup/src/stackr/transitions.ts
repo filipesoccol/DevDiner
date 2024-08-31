@@ -5,13 +5,11 @@ import { slugifyString } from "./utils";
 
 const setMyRestrictions: STF<DevDinerState> = {
   handler: ({ inputs, state, msgSender, emit }) => {
-
-    console.log('Vai chegar', state.developers, msgSender);
     const event = state.events.find((event) => event.id === inputs.event)
     if (!event) throw new Error(`Event with name ${inputs.event} not found`);
 
-    // if (!event.participants.find((p) => p === msgSender))
-    event.participants.push(msgSender);
+    if (!event.participants.find((p) => p === msgSender))
+      event.participants.push(msgSender);
 
     state.developers.push({
       address: msgSender,
