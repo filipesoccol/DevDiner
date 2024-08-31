@@ -1,22 +1,45 @@
 import { STF, Transitions } from "@stackr/sdk/machine";
 import { DevDinerState } from "./state";
+import { slugifyString } from "./utils";
+
 
 const setMyRestrictions: STF<DevDinerState> = {
   handler: ({ inputs, state, msgSender, emit }) => {
+
+    console.log('Vai chegar', state.developers, msgSender);
+    const event = state.events.find((event) => event.id === inputs.event)
+    if (!event) throw new Error(`Event with name ${inputs.event} not found`);
+
+    // if (!event.participants.find((p) => p === msgSender))
+    event.participants.push(msgSender);
+
     state.developers.push({
       address: msgSender,
-      modifiedAt: Date.now(),
+      modifiedAt: inputs.timestamp,
       restrictions: inputs.restrictions,
     });
-    emit({ name: "Developers", value: JSON.stringify(state) });
+    emit({ name: "Added Developer", value: msgSender });
     return state;
   },
 };
 
 const createEvent: STF<DevDinerState> = {
   handler: ({ inputs, state, emit }) => {
-    state.events.push(inputs);
-    // emit({ name: "ValueAfterIncrement", value: state });
+
+    const id = slugifyString(inputs.name)
+    if (state.events.find((event) => event.id === slugifyString(inputs.name)))
+      throw new Error(`Event with name ${inputs.name} already exists`);
+
+    state.events.push({
+      id,
+      name: inputs.name,
+      startAt: inputs.startAt,
+      endAt: inputs.endAt,
+      cancelledAt: 0,
+      modifiedAt: Date.now(),
+      participants: [],
+    });
+    emit({ name: "Event Id", value: id });
     return state;
   },
 };

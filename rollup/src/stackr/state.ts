@@ -19,12 +19,13 @@ export type Developer = {
 };
 
 export type Event = {
-  id: number;
+  id: string;
   name: string;
   modifiedAt: number;
   startAt: number;
   endAt: number;
-  participants: string;
+  cancelledAt: number;
+  participants: string[];
 };
 
 export type DevDiner = {
@@ -60,23 +61,14 @@ class DevDinerWrapper {
       );
     });
 
-    let merkletreeDevelopers = new MerkleTree(
-      hashedLeavesDevelopers,
-      solidityPackedKeccak256
-    );
-
+    let merkletreeDevelopers = new MerkleTree(hashedLeavesDevelopers);
     const hashedLeavesEvents = events.map((leaf: Event) => {
       return solidityPackedKeccak256(
-        ["uint256", "string", "uint256", "uint256", "uint256", "bytes32"],
-        [leaf.id, leaf.name, leaf.modifiedAt, leaf.startAt, leaf.endAt, leaf.participants]
+        ["string", "string", "uint256", "uint256", "uint256", "uint256", "address[]"],
+        [leaf.id, leaf.name, leaf.modifiedAt, leaf.startAt, leaf.endAt, leaf.cancelledAt, leaf.participants]
       );
     });
-
-    let merkletreeEvents = new MerkleTree(
-      hashedLeavesEvents,
-      solidityPackedKeccak256
-    );
-
+    let merkletreeEvents = new MerkleTree(hashedLeavesEvents);
     return { merkletreeDevelopers, merkletreeEvents };
   }
 }
