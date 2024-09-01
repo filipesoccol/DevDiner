@@ -1,10 +1,9 @@
-import { ActionConfirmationStatus, ActionSchema } from "@stackr/sdk";
-import { HDNodeWallet, solidityPackedKeccak256, Wallet } from "ethers";
+import { ActionConfirmationStatus } from "@stackr/sdk";
+import { Wallet } from "ethers";
 import { mru } from "./stackr/mru.ts";
 import { CreateEvent, SetMyRestrictions } from "./stackr/schemas.ts";
 import { signMessage } from "./utils.ts";
-import { timeStamp } from "console";
-import MerkleTree from "merkletreejs";
+
 
 
 const main = async () => {
@@ -12,13 +11,6 @@ const main = async () => {
 
   // Create a random wallet
   const wallets = new Array(100).fill(0).map(() => Wallet.createRandom());
-
-  new MerkleTree(
-    [
-      "0xeb4142ed0559140c26c848e86f0afc8f883713200769bbd5fc9c751bbe8b2912",
-      "0x249e098be492cbe52e106998269ab3708327f3dc7af463aef142b2ea633944ee"
-    ]
-  );
 
   for (const e of ['My Nice Event', 'My Nice Event 2', 'My Nice Event 3']) {
     const inputs = {
@@ -62,8 +54,7 @@ const main = async () => {
 
     // leverage the ack to wait for C1 and access logs & error from STF execution
     const res = await ack.waitFor(ActionConfirmationStatus.C1);
-    // console.log(res);
-    // await new Promise((r) => setTimeout(r, 5000));
+    console.log(res);
   }
 
 

@@ -2,7 +2,6 @@ import { STF, Transitions } from "@stackr/sdk/machine";
 import { DevDinerState } from "./state";
 import { slugifyString } from "./utils";
 
-
 const setMyRestrictions: STF<DevDinerState> = {
   handler: ({ inputs, state, msgSender, emit }) => {
     const event = state.events.find((event) => event.id === inputs.event)

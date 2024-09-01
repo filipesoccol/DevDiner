@@ -1,8 +1,8 @@
 import { getFrameMetadata } from 'frog/next'
 import type { Metadata } from 'next'
 import Image from 'next/image'
-
-import styles from './page.module.css'
+import { useEffect, useRef } from 'react'
+import PieChart from './components/PieChart';
 
 export async function generateMetadata(): Promise<Metadata> {
   const frameTags = await getFrameMetadata(
@@ -14,106 +14,61 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>app/page.tsx</code>
-          </p>
-          <p>
-            Head to{' '}
-            <a
-              href="/api/dev"
-              style={{ display: 'inline', fontWeight: 'semibold' }}
-            >
-              <code className={styles.code}>localhost:3000/api</code>
-            </a>{' '}
-            for your frame endpoint.
-          </p>
-        </div>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
 
-      <div className={styles.center}>
+  const randomImage = () => {
+    const images = ['/image1.png', '/image2.png', '/image3.png', '/image4.png'];
+    const randomIndex = Math.floor(Math.random() * images.length);
+    return `url(${images[randomIndex]})`;
+  }
+
+  const backgroundImage = randomImage();
+
+  const data = [20, 10, 15, 30, 5, 10, 5, 5];
+  const colors = ['#40AABF', '#8AB34C', '#D6BF29', '#DB4439', '#40AABF', '#8AB34C', '#D6BF29', '#DB4439'];
+  const labels = ['Gluten Free', 'Dairy Free', 'Sugar Free', 'Vegan', 'Kosher', 'Halal', 'Food allergies', 'Low Sodium'];
+
+  return (
+    <div className="w-full flex flex-col p-4 gap-2">
+      <div className='flex gap-4 w-100'>
         <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
+          src="/logo.svg"
+          alt="Dev Diner Logo"
+          width={100}
+          height={137}
           priority
         />
+        <hr className='w-full border-solid border-orange border self-end' />
       </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div className='flex gap-4 w-100 bg-orange text-beige p-6 min-h-40 items-center header-background' style={{ backgroundImage: backgroundImage }} >
+        <h1 className='text-2xl md:text-4xl'>Feed your devs<br /> responsibly.</h1>
       </div>
-    </main>
+      <hr className='w-full border-solid border-orange border self-end' />
+      <div className='flex flex-col bg-orange text-beige gap-4 w-100 p-6 items-center' >
+        <p>A project to serve a survey application for collecting developers data related to their diets. This is important to track that data to serve different meal options during in-person events.</p>
+        <div className='flex gap-6'>
+          <div className='bg-black rounded-full pb-2'>
+            <button className='special-button'>Create an Event</button>
+          </div>
+          <div className='bg-black rounded-full pb-2'>
+            <button className='special-button'>Browse Events</button>
+          </div>
+        </div>
+      </div>
+      <hr className='w-full border-solid border-orange border self-end' />
+      <div className='flex flex-col w-100 gap-4 w-100  text-orange p-2 min-h-40 items-center' >
+        <h1 className=''>Current tracked restrictions</h1>
+        <PieChart data={data} colors={colors} labels={labels} />
+      </div>
+      <hr className='w-full border-solid border-orange border self-end' />
+      <div className='flex flex-col gap-2 w-100 p-2 min-h-40 items-center' >
+        <h1 className=''>created by</h1>
+        <Image
+          src="/creator.png"
+          alt="Creator Avatar"
+          width={80}
+          height={80}
+          priority></Image>
+      </div>
+    </div>
   )
 }
