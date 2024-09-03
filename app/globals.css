@@ -29,10 +29,17 @@ body {
 .special-button {
   @apply bg-beige
    text-black
-    font-bold 
     py-2 px-4 
     rounded-full 
     hover:-translate-y-1
     active:translate-y-0
     transition-transform;
+}
+
+.stack-holder {
+  display: grid;
+
+  & > * {
+    grid-area: 1 / 1 / 1 / 1;
+  }
 }

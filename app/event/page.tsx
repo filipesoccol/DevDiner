@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
     }
 }
 
-const Event = () => {
+const CreateEvent = () => {
 
     const data = [20, 10, 15, 30, 5, 5, 5, 5];
     const colors = ['#40AABF', '#8AB34C', '#D6BF29', '#DB4439', '#40AABF', '#8AB34C', '#D6BF29', '#DB4439'];
@@ -31,7 +31,7 @@ const Event = () => {
                 /></Link>
                 <h2 className='border-b-2 border-orange self-end w-full text-right'>Create your event</h2>
             </div>
-            <div className='flex flex-col  gap-4 w-100 p-6 items-center' >
+            <div className='flex flex-col bg-orange text-beige gap-4 w-100 p-6 items-center' >
                 <p>Connect your wallet then fill the form. After that you will be served with some links to share on your social networks. No transaction is required to create the event.</p>
                 <CreateEventForm></CreateEventForm>
             </div>
@@ -49,4 +49,4 @@ const Event = () => {
     )
 }
 
-export default Event;
+export default CreateEvent;

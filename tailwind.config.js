@@ -16,6 +16,8 @@ export default {
       'black': '#2C263D',
     },
   },
-  plugins: [],
+  plugins: [
+    require("tailwindcss-animate")
+  ]
 }
 
