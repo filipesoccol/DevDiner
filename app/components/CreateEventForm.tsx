@@ -5,7 +5,7 @@ import { WalletContext } from './WalletProvider';
 import WalletComponent from './WalletComponent';
 import EthersRPC from '../services/EthersRPC';
 
-import { createEventPost } from '@/app/services/rollupService';
+import { rollupPost } from '@/app/services/rollup';
 
 const CreateEventForm: React.FC = () => {
     const wallet = useContext(WalletContext);
@@ -14,6 +14,7 @@ const CreateEventForm: React.FC = () => {
         startAt: '',
         endAt: ''
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,10 +23,12 @@ const CreateEventForm: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!wallet?.account) return;
-        if (!wallet?.provider) return;
+        if (!wallet?.account || !wallet?.provider) return;
 
+        setIsSubmitting(true);
         try {
+
+            const actionName = 'createEvent';
             // Create message using CreateEvent schema
             const message = {
                 name: formData.name,
@@ -33,11 +36,11 @@ const CreateEventForm: React.FC = () => {
                 endAt: new Date(formData.endAt).getTime()
             };
 
-            const signature = await EthersRPC.signMessage(wallet.provider, 'createEvent', message);
+            const signature = await EthersRPC.signMessage(wallet.provider, actionName, message);
 
             console.log('signature', signature);
             // Send to rollupService
-            const response = await createEventPost({
+            const response = await rollupPost(actionName, {
                 inputs: message,
                 signature,
                 msgSender: wallet.account
@@ -48,6 +51,8 @@ const CreateEventForm: React.FC = () => {
         } catch (error) {
             console.error('Error creating event:', error);
             // Handle error (e.g., show error message to user)
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -105,7 +110,20 @@ const CreateEventForm: React.FC = () => {
                         </div>
                     </div>
                     <div className='flex gap-6'>
-                        <button type="submit" className='special-button'>Create Event Survey</button>
+                        <button
+                            type="submit"
+                            className='special-button flex items-center justify-center'
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <span className="mr-2">Creating...</span>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                </>
+                            ) : (
+                                'Create Event Survey'
+                            )}
+                        </button>
                     </div>
                 </form>
             )}

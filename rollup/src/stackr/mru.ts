@@ -5,7 +5,7 @@ import { CreateEvent, schemas, SetMyRestrictions, UpdateEvent } from "./schemas"
 import { Playground } from "@stackr/sdk/plugins";
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { verifyMessage, verifyTypedData } from "ethers";
+import { verifyTypedData } from "ethers";
 
 // INITIALIZING EXPRESS
 const app = express();
@@ -43,7 +43,7 @@ if (process.env.NODE_ENV === "development") {
   );
 }
 
-app.get("/getTypes/:action", (req: Request, res: Response) => {
+app.get("/get-types/:action", (req: Request, res: Response) => {
   const { action } = req.params;
   console.log(action)
   if (action in schemas) {
@@ -53,68 +53,37 @@ app.get("/getTypes/:action", (req: Request, res: Response) => {
   return res.status(400).send({ error: "Invalid action" });
 });
 
+app.post("/submit-action/:schemaName", async (req: Request, res: Response) => {
+  try {
+    const { schemaName } = req.params;
+    const { inputs, signature, msgSender } = req.body;
+
+    if (!(schemaName in schemas)) {
+      return res.status(400).json({ success: false, error: "Invalid schema name" });
+    }
+
+    const schema = schemas[schemaName as keyof typeof schemas];
+    const action = schema.actionFrom({
+      inputs,
+      signature,
+      msgSender,
+    });
+
+    const ack = await mru.submitAction(schemaName, action);
+
+    res.status(200).json({ success: true, hash: ack.hash });
+  } catch (error) {
+    console.error(`Error in submit-action for schema ${req.params.schemaName}:`, error);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+
 // Adding Real functions
 app.get("/root-hash", async (req: Request, res: Response) => {
   const { hash } = req.params;
   // const event = state?.events.find((e) => e.fid === Number(fid));
   const root = state?.stateRootHash;
   return res.send({ root });
-});
-
-app.post("/set-restriction", async (req: Request, res: Response) => {
-  try {
-    const { inputs, signature, address } = req.body;
-
-    const setMyRestrictions = SetMyRestrictions.actionFrom({
-      inputs,
-      signature,
-      msgSender: address,
-    });
-
-    const ack = await mru.submitAction("setMyRestrictions", setMyRestrictions);
-    console.log(ack.hash);
-
-    res.status(200).json({ success: true, hash: ack.hash });
-  } catch (error) {
-    console.error("Error in set-my-restrictions:", error);
-    res.status(500).json({ success: false, error: "Internal server error" });
-  }
-});
-
-app.post("/create-event", async (req: Request, res: Response) => {
-  try {
-    const { inputs, signature, msgSender } = req.body;
-
-    const domain = {
-      name: "DevDiner v0",
-      version: "1",
-      verifyingContract: "0x0000000000000000000000000000000000000000" as `0x${string}`,
-      salt: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" as `0x${string}`,
-    }
-
-    const eip712Types = schemas['createEvent'].EIP712TypedData.types;
-
-    const signerAddr = await verifyTypedData(domain, eip712Types, inputs, signature);
-    if (signerAddr !== msgSender) {
-      console.log("Invalid signature")
-    } else {
-      console.log("Valid signature")
-    }
-
-    const createEvent = CreateEvent.actionFrom({
-      inputs,
-      signature,
-      msgSender,
-    });
-
-    const ack = await mru.submitAction("createEvent", createEvent);
-    console.log(ack.hash);
-
-    res.status(200).json({ success: true, hash: ack.hash });
-  } catch (error) {
-    console.error("Error in create-event:", error);
-    res.status(500).json({ success: false, error: "Internal server error" });
-  }
 });
 
 app.listen(5050, () => {

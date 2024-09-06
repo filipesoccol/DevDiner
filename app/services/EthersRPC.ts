@@ -6,8 +6,9 @@ import { BigNumberish, ethers } from "ethers";
 const domain = {
     name: "DevDiner v0",
     version: "1",
-    verifyingContract: "0x0000000000000000000000000000000000000000" as `0x${string}`,
-    salt: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" as `0x${string}`,
+    chainId: 11155111,
+    verifyingContract: "0x0000000000000000000000000000000000000000",
+    salt: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
 }
 
 const chainConfig = {
@@ -78,7 +79,7 @@ const signMessage = async (provider: IProvider, actionName: string, input: any):
         const signer = await ethersProvider.getSigner();
 
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_ROLLUP_URL}/getTypes/${actionName}`
+            `${process.env.NEXT_PUBLIC_ROLLUP_URL}/get-types/${actionName}`
         );
 
         const types = await response.json();
