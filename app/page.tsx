@@ -62,7 +62,7 @@ export default function Home() {
       <hr className='w-full border-solid border-orange border self-end' />
       <div className='flex flex-col w-100 gap-4 w-100  text-orange p-2 min-h-40 items-center' >
         <h1 className=''>Current tracked restrictions</h1>
-        <PieChart data={data} colors={colors} labels={labels} />
+        <PieChart data={data} colors={colors} labels={labels} width={400} height={300} />
       </div>
       <hr className='w-full border-solid border-orange border self-end' />
       <Footer />

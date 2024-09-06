@@ -1,67 +1,55 @@
 "use client"
 
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
 
 interface PieChartProps {
     data: number[];
     colors: string[];
     labels: string[];
+    width?: number;
+    height?: number;
 }
 
-const PieChart: React.FC<PieChartProps> = ({ data, colors, labels }) => {
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const [radius, setRadius] = useState<number>(0);
+const PieChart: React.FC<PieChartProps> = ({ data, colors, labels, width = 400, height = 400 }) => {
+    const total = data.reduce((sum, value) => sum + value, 0);
+    const radius = Math.min(width, height) / 2;
+    const center = { x: width / 2, y: height / 2 };
 
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        const total = data.reduce((acc, value) => acc + value, 0);
-        let startAngle = 0;
+    let startAngle = 0;
+    const slices = data.map((value, index) => {
+        const angle = (value / total) * 360;
+        const endAngle = startAngle + angle;
 
-        const drawChart = (currentRadius: number) => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            startAngle = 0;
-            data.forEach((value, index) => {
-                const sliceAngle = (value / total) * 2 * Math.PI;
-                ctx.beginPath();
-                ctx.moveTo(80, 80); // Center of the pie chart
-                ctx.arc(80, 80, currentRadius, startAngle, startAngle + sliceAngle);
-                ctx.closePath();
-                ctx.fillStyle = colors[index];
-                ctx.fill();
-                startAngle += sliceAngle;
-            });
-        };
+        const start = polarToCartesian(center, radius, startAngle);
+        const end = polarToCartesian(center, radius, endAngle);
 
-        const animate = () => {
-            setRadius((prevRadius) => {
-                const newRadius = prevRadius + 1;
-                if (newRadius <= 75) {
-                    drawChart(newRadius);
-                    requestAnimationFrame(animate);
-                }
-                return newRadius;
-            });
-        };
+        const largeArcFlag = angle > 180 ? 1 : 0;
 
-        animate();
-    }, [data, colors]);
+        const d = [
+            "M", center.x, center.y,
+            "L", start.x, start.y,
+            "A", radius, radius, 0, largeArcFlag, 1, end.x, end.y,
+            "Z"
+        ].join(" ");
+
+        startAngle = endAngle;
+
+        return <path key={index} d={d} fill={colors[index]} />;
+    });
 
     return (
-        <div className='flex gap-4'>
-            <canvas ref={canvasRef} width={160} height={160} />
-            <div className="flex flex-col mt-2.5">
-                {labels.map((label, index) => (
-                    <div key={index} className="flex items-center mb-1.25">
-                        <div className="w-3 h-3 mr-2" style={{ backgroundColor: colors[index] }}></div>
-                        <span className='text-xs'>{label}</span>
-                    </div>
-                ))}
-            </div>
-        </div>
+        <svg width={width} height={height}>
+            {slices}
+        </svg>
     );
 };
+
+function polarToCartesian(center: { x: number, y: number }, radius: number, angleInDegrees: number) {
+    const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+    return {
+        x: center.x + (radius * Math.cos(angleInRadians)),
+        y: center.y + (radius * Math.sin(angleInRadians))
+    };
+}
 
 export default PieChart;

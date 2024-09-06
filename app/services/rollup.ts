@@ -56,7 +56,53 @@ export const rollupPost = async <T extends RollupParams>(endpoint: string, param
     }
 };
 
+
+// Type definition for the event data returned by getEventBySlug
+export type EventWithRestrictions = {
+    success: boolean;
+    eventWithRestrictions: {
+        id: string;
+        name: string;
+        startAt: number;
+        endAt: number;
+        cancelledAt: number;
+        modifiedAt: number;
+        participants: string[];
+        restrictionsSum: {
+            GLUTEN_FREE: number;
+            LACTOSE_FREE: number;
+            LOW_SUGAR: number;
+            LOW_SODIUM: number;
+            KOSHER: number;
+            HALAL: number;
+            FODMAPS: number;
+        };
+    };
+};
+
+// Function to get event information by slug
+export const getEventBySlug = async (slug: string) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_ROLLUP_URL}/event/${slug}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json() as EventWithRestrictions;
+    } catch (error) {
+        console.error(`Error fetching event with slug ${slug}:`, error);
+        throw error;
+    }
+};
+
+
 // Example usage:
-// const createEventResult = await rollupPost('create-event', createEventParams);
-// const setRestrictionsResult = await rollupPost('set-my-restrictions', setMyRestrictionsParams);
-// const updateEventResult = await rollupPost('update-event', updateEventParams);
+// const createEventResult = await rollupPost('createEvent', createEventParams);
+// const setRestrictionsResult = await rollupPost('setMyRestrictions', setMyRestrictionsParams);
+// const updateEventResult = await rollupPost('updateEvent', updateEventParams);
