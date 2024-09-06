@@ -1,7 +1,7 @@
+import Footer from '@/app/components/Footer'
 import { getFrameMetadata } from 'frog/next'
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import CreateEventForm from '../components/CreateEventForm'
 import Link from 'next/link'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -33,18 +33,9 @@ const Event = () => {
             </div>
             <div className='flex flex-col  gap-4 w-100 p-6 items-center' >
                 <p>Connect your wallet then fill the form. After that you will be served with some links to share on your social networks. No transaction is required to create the event.</p>
-                <CreateEventForm></CreateEventForm>
             </div>
             <hr className='w-full border-solid border-orange border self-end' />
-            <div className='flex flex-col gap-2 w-100 p-2 min-h-40 items-center' >
-                <h1 className=''>created by</h1>
-                <Image
-                    src="/creator.png"
-                    alt="Creator Avatar"
-                    width={80}
-                    height={80}
-                    priority></Image>
-            </div>
+            <Footer />
         </div>
     )
 }

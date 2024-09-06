@@ -18,3 +18,9 @@ export const UpdateEvent = new ActionSchema("updateEvent", {
   timestamp: SolidityType.UINT,
   participants: SolidityType.BYTES
 });
+
+export const schemas = {
+  createEvent: CreateEvent,
+  setMyRestrictions: SetMyRestrictions,
+  updateEvent: UpdateEvent
+}

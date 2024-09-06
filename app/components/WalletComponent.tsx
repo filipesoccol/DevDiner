@@ -1,6 +1,9 @@
+declare module 'react-jdenticon';
+
 import { useContext, useState } from "react";
 import { WalletContext } from "./WalletProvider";
 import Jdenticon from 'react-jdenticon';
+import { isAddress } from "ethers";
 
 const WalletComponent = () => {
 
@@ -9,7 +12,7 @@ const WalletComponent = () => {
 
     return (
         <>
-            {wallet?.loggedIn ? (
+            {wallet?.loggedIn && isAddress(wallet?.account) ? (
                 <button
                     className='special-button flex flex-row items-center bg-beige text-black'
                     onMouseEnter={() => setHovered(false)}
@@ -19,7 +22,9 @@ const WalletComponent = () => {
                     {wallet?.userInfo.profileImage ? (
                         <img className="mr-2 rounded-full" src={wallet.userInfo.profileImage} width={30} height={30} />
                     ) : (
-                        <div className='mr-2 rounded-full'><Jdenticon size={30} value={wallet.account} /></div>
+                        <div className='mr-2 rounded-full'>
+                            <Jdenticon size="30" value={wallet.account} />
+                        </div>
                     )}
                     <div className="stack-holder">
                         <div className={`transition-all ${hovered ? 'translate-x-0 opacity-100' : 'opacity-0 translate-x-6'}`}>

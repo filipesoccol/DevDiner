@@ -57,3 +57,31 @@ Inside developer tool head to http://localhost:3000/api
 To see the default page where you can register events please navigate to the default page http://localhost:3000.
 
 ## References:
+
+## Running with PM2
+
+To run both the rollup service and the dev service concurrently using PM2:
+
+1. Install PM2 globally if you haven't already:
+
+   ```sh
+   npm install -g pm2
+   ```
+
+2. Start the services:
+
+   ```sh
+   pm2 start ecosystem.config.js
+   ```
+
+3. To stop the services:
+
+   ```sh
+   pm2 stop ecosystem.config.js
+   ```
+
+4. To monitor the services:
+
+   ```sh
+   pm2 monit
+   ```

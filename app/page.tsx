@@ -4,6 +4,7 @@ import Image from 'next/image'
 
 import PieChart from './components/PieChart';
 import Link from 'next/link';
+import Footer from './components/Footer';
 
 export async function generateMetadata(): Promise<Metadata> {
   const frameTags = await getFrameMetadata(
@@ -64,15 +65,7 @@ export default function Home() {
         <PieChart data={data} colors={colors} labels={labels} />
       </div>
       <hr className='w-full border-solid border-orange border self-end' />
-      <div className='flex flex-col gap-2 w-100 p-2 min-h-40 items-center' >
-        <h1 className=''>created by</h1>
-        <Image
-          src="/creator.png"
-          alt="Creator Avatar"
-          width={80}
-          height={80}
-          priority></Image>
-      </div>
+      <Footer />
     </div>
   )
 }

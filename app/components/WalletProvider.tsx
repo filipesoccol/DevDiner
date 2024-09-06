@@ -3,12 +3,12 @@
 import { CHAIN_NAMESPACES, IProvider, UserInfo, WEB3AUTH_NETWORK } from "@web3auth/base";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { Web3Auth } from "@web3auth/modal";
-import RPC from "./EthersRPC";
+import RPC from "../services/EthersRPC";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { MetamaskAdapter } from "@web3auth/metamask-adapter";
 import { ActionSchema } from "@stackr/sdk";
 
-const clientId = process.env.WEB3_AUTH_CLIENTID || '';
+const clientId = process.env.NEXT_PUBLIC_WEB3_AUTH_CLIENTID || '';
 const privateKeyProvider = new EthereumPrivateKeyProvider({
     config: { chainConfig: RPC.chainConfig },
 });
@@ -35,7 +35,7 @@ interface WalletContextType {
     userInfo: Partial<UserInfo>;
     login: () => Promise<void>;
     logout: () => Promise<void>;
-    signTypedMessage: (messageType: ActionSchema, input: any) => Promise<void>;
+    signTypedMessage: (messageType: ActionSchema, input: any) => Promise<string | undefined>;
     sendTransaction: () => Promise<void>;
 }
 
@@ -74,7 +74,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         setProvider(web3auth.provider);
         setLoggedIn(true);
         setUserInfo(await web3auth.getUserInfo())
-        console.log(await web3auth.getUserInfo())
         setAccount(await RPC.getAccounts(web3auth.provider))
     }
 

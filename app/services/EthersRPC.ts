@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CreateEvent } from "@/rollup/src/stackr/schemas";
 import { CHAIN_NAMESPACES, type IProvider } from "@web3auth/base";
-import { ethers } from "ethers";
-import { ActionSchema } from "@stackr/sdk";
+import { BigNumberish, ethers } from "ethers";
+
+// Copy from Stackr.config.js
+const domain = {
+    name: "DevDiner v0",
+    version: "1",
+    verifyingContract: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+    salt: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" as `0x${string}`,
+}
 
 const chainConfig = {
     chainNamespace: CHAIN_NAMESPACES.EIP155,
@@ -66,12 +72,21 @@ const sendTransaction = async (provider: IProvider): Promise<any> => {
     }
 }
 
-const signMessage = async (provider: IProvider, messageType: ActionSchema, input: any): Promise<string> => {
+const signMessage = async (provider: IProvider, actionName: string, input: any): Promise<string> => {
     try {
         const ethersProvider = new ethers.BrowserProvider(provider);
         const signer = await ethersProvider.getSigner();
-        // Sign the message
-        return await signer.signTypedData(messageType.domain, messageType.EIP712TypedData.types, input);
+
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_ROLLUP_URL}/getTypes/${actionName}`
+        );
+
+        const types = await response.json();
+        return await signer.signTypedData(
+            domain,
+            types.eip712Types,
+            input,
+        );
     } catch (error) {
         return error as string;
     }
