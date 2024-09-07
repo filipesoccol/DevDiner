@@ -27,31 +27,6 @@ const app = new Frog<{ State: State }>({
   }
 })
 
-app.frame('/:slug', async (c) => {
-  const { deriveState } = c
-  const slug = c.req.param('slug');
-  const event = await getEventBySlug(slug);
-  const data = event.eventWithRestrictions.restrictionsSum;
-  const state = deriveState(previousState => {
-    previousState.eventName = event.eventWithRestrictions.name;
-    previousState.eventSlug = slug;
-    previousState.participantCount = event.eventWithRestrictions.participantCount;
-    previousState.restrictionsSum = Object.values(event.eventWithRestrictions.restrictionsSum);
-  })
-  return c.res({
-    action: `/finish/${slug}`,
-    image: (
-      <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
-        Event Name: {state.eventName}
-        Participants: {data.participantCount}
-      </div>
-    ),
-    intents: [
-      <Button.Signature target="/sign" >Sign</Button.Signature >,
-    ]
-  })
-})
-
 app.frame('/finish/', async (c) => {
 
   const { transactionId, deriveState } = c
@@ -101,6 +76,31 @@ app.signature('/sign/', async (c) => {
         timestamp: Date.now(),
       },
     },
+  })
+})
+
+app.frame('/:slug', async (c) => {
+  const { deriveState } = c
+  const slug = c.req.param('slug');
+  const event = await getEventBySlug(slug);
+  const data = event.eventWithRestrictions.restrictionsSum;
+  const state = deriveState(previousState => {
+    previousState.eventName = event.eventWithRestrictions.name;
+    previousState.eventSlug = slug;
+    previousState.participantCount = event.eventWithRestrictions.participantCount;
+    previousState.restrictionsSum = Object.values(event.eventWithRestrictions.restrictionsSum);
+  })
+  return c.res({
+    action: `/finish/${slug}`,
+    image: (
+      <div style={{ color: 'white', display: 'flex', fontSize: 60 }}>
+        Event Name: {state.eventName}
+        Participants: {data.participantCount}
+      </div>
+    ),
+    intents: [
+      <Button.Signature target="/sign" >Sign</Button.Signature >,
+    ]
   })
 })
 
