@@ -9,6 +9,7 @@ import PieChart from '@/app/components/PieChart'
 import { Restrictions } from '@/rollup/src/stackr/state';
 import { PieColors, RestrictionLabels } from '@/app/interfaces'
 import EventShareLink from '@/app/components/EventShareLink'
+import BarChart from '@/app/components/BarChart'
 
 export async function generateMetadata(): Promise<Metadata> {
     const frameTags = await getFrameMetadata(
@@ -46,13 +47,11 @@ async function Event({ params }: EventProps) {
                     This event starts at: {new Date(event.eventWithRestrictions.startAt).toLocaleString()}, and ends at: {new Date(event.eventWithRestrictions.endAt).toLocaleString()}. Number of participants in this survey currently is {event.eventWithRestrictions.participantCount}. {event.eventWithRestrictions.cancelledAt ? `This event was cancelled on ${new Date(event.eventWithRestrictions.cancelledAt).toLocaleString()}.` : ''}
                 </div>
                 <EventShareLink slug={slug} />
-                <div className='text-beige'>Select here your food restrictions and submit.</div>
-                <DietaryRestrictionsForm slug={slug} />
             </div>
             <hr className='w-full border-solid border-orange border self-end' />
             <div className='flex flex-col bg-beige gap-4 w-100 p-6 items-center' >
-                <h4 className="text-xl font-semibold mb-2">Dietary Restrictions for this event</h4>
-                <PieChart data={data} width={600} height={400} />
+                <h4 className="text-xl font-semibold mb-2">Dietary Restrictions for {event.eventWithRestrictions.participantCount} participants</h4>
+                <BarChart data={data} total={event.eventWithRestrictions.participantCount} width={350} height={350} />
                 <div className="mt-4 text-sm">
                     <h5 className="font-semibold mb-2">Legend:</h5>
                     <ul className="grid grid-cols-2 gap-2">
@@ -67,6 +66,11 @@ async function Event({ params }: EventProps) {
                         ))}
                     </ul>
                 </div>
+            </div>
+            <hr className='w-full border-solid border-orange border self-end' />
+            <div className='flex flex-col bg-orange gap-4 w-100 p-6 items-center' >
+                <div className='text-beige'>Select here your food restrictions and submit.</div>
+                <DietaryRestrictionsForm slug={slug} />
             </div>
             <hr className='w-full border-solid border-orange border self-end' />
             <Footer />

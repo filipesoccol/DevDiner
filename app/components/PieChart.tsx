@@ -5,12 +5,12 @@ import { PieColors } from '@/app/interfaces';
 
 interface PieChartProps {
     data: number[];
+    total: number;
     width?: number;
     height?: number;
 }
 
-const PieChart: React.FC<PieChartProps> = ({ data, width = 400, height = 400 }) => {
-    const total = data.reduce((sum, value) => sum + value, 0);
+const PieChart: React.FC<PieChartProps> = ({ data, total, width = 350, height = 350 }) => {
     const radius = Math.min(width, height) / 2;
     const center = { x: width / 2, y: height / 2 };
 
@@ -20,7 +20,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, width = 400, height = 400 }) 
             return null; // Skip rendering for zero values
         }
 
-        const angle = (value / total) * 360;
+        const angle = ((value / total) * 160 / total);
         const endAngle = startAngle + angle;
 
         const start = polarToCartesian(center, radius, startAngle);

@@ -6,6 +6,7 @@ import WalletComponent from './WalletComponent';
 import EthersRPC from '../services/EthersRPC';
 import { rollupPost } from '@/app/services/rollup';
 import { Restriction, RestrictionLabels } from '../interfaces';
+import ConfirmationDialog from './ConfirmationDialog';
 
 interface DietaryRestrictionsFormProps {
     slug: string;
@@ -15,6 +16,7 @@ const DietaryRestrictionsForm: React.FC<DietaryRestrictionsFormProps> = ({ slug 
     const wallet = useContext(WalletContext);
     const [selectedRestrictions, setSelectedRestrictions] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     const handleRestrictionToggle = (restriction: string) => {
         setSelectedRestrictions(prev =>
@@ -62,7 +64,7 @@ const DietaryRestrictionsForm: React.FC<DietaryRestrictionsFormProps> = ({ slug 
             });
 
             console.log('Dietary restrictions submitted:', response);
-            // Handle success (e.g., show a success message, reset form, etc.)
+            setShowConfirmation(true);
         } catch (error) {
             console.error('Error submitting dietary restrictions:', error);
             // Handle error (e.g., show error message to user)
@@ -108,6 +110,12 @@ const DietaryRestrictionsForm: React.FC<DietaryRestrictionsFormProps> = ({ slug 
                     </button>
                 </form>
             )}
+            <ConfirmationDialog
+                isOpen={showConfirmation}
+                onClose={() => setShowConfirmation(false)}
+                title="Dietary Restrictions Submitted"
+                message="Your dietary restrictions have been successfully submitted."
+            />
         </>
     );
 };

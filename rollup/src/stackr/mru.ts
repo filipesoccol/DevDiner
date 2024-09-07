@@ -1,4 +1,4 @@
-import { MicroRollup } from "@stackr/sdk";
+import { ActionConfirmationStatus, MicroRollup } from "@stackr/sdk";
 import { stackrConfig } from "../../stackr.config";
 import { machine, APPID } from "./machine";
 import { CreateEvent, schemas, SetMyRestrictions, UpdateEvent } from "./schemas";
@@ -44,7 +44,7 @@ if (process.env.NODE_ENV === "development") {
   );
 }
 
-app.get("/get-types/:action", (req: Request, res: Response) => {
+app.get(process.env.SUBPATH + "/get-types/:action", (req: Request, res: Response) => {
   const { action } = req.params;
   console.log(action)
   if (action in schemas) {
@@ -54,7 +54,7 @@ app.get("/get-types/:action", (req: Request, res: Response) => {
   return res.status(400).send({ error: "Invalid action" });
 });
 
-app.post("/submit-action/:schemaName", async (req: Request, res: Response) => {
+app.post(process.env.SUBPATH + "/submit-action/:schemaName", async (req: Request, res: Response) => {
   try {
     const { schemaName } = req.params;
     const { inputs, signature, msgSender } = req.body;
@@ -72,14 +72,15 @@ app.post("/submit-action/:schemaName", async (req: Request, res: Response) => {
 
     const ack = await mru.submitAction(schemaName, action);
 
-    res.status(200).json({ success: true, hash: ack.hash });
+    const confirmation = await ack.waitFor(ActionConfirmationStatus.C1);
+    res.status(200).json({ success: true, confirmation });
   } catch (error) {
     console.error(`Error in submit-action for schema ${req.params.schemaName}:`, error);
     res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
-app.get("/summary", async (_req: Request, res: Response) => {
+app.get(process.env.SUBPATH + "/summary", async (_req: Request, res: Response) => {
   try {
     if (!state || !state.state || !state.state.developers) {
       return res.status(500).json({ success: false, error: "State is not initialized" });
@@ -123,7 +124,7 @@ app.get("/summary", async (_req: Request, res: Response) => {
 });
 
 
-app.get("/event/:slug", async (req: Request, res: Response) => {
+app.get(process.env.SUBPATH + "/event/:slug", async (req: Request, res: Response) => {
   try {
     const { slug } = req.params;
 
@@ -184,7 +185,7 @@ app.get("/event/:slug", async (req: Request, res: Response) => {
 
 
 // Adding Real functions
-app.get("/root-hash", async (req: Request, res: Response) => {
+app.get(process.env.SUBPATH + "/root-hash", async (req: Request, res: Response) => {
   const { hash } = req.params;
   // const event = state?.events.find((e) => e.fid === Number(fid));
   const root = state?.stateRootHash;

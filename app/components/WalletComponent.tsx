@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import { WalletContext } from "./WalletProvider";
+// @ts-ignore
 import Jdenticon from 'react-jdenticon';
 import { isAddress } from "ethers";
 

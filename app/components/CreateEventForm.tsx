@@ -4,6 +4,7 @@ import React, { useContext, useState } from 'react';
 import { WalletContext } from './WalletProvider';
 import WalletComponent from './WalletComponent';
 import EthersRPC from '../services/EthersRPC';
+import EventCreatedDialog from './EventCreatedDialog';
 
 import { rollupPost } from '@/app/services/rollup';
 
@@ -15,6 +16,8 @@ const CreateEventForm: React.FC = () => {
         endAt: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [createdEventId, setCreatedEventId] = useState('');
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -47,7 +50,11 @@ const CreateEventForm: React.FC = () => {
             });
 
             console.log('Event created:', response);
-            // Handle success (e.g., show a success message, reset form, etc.)
+
+            // Assuming the response includes the created event's ID
+            setCreatedEventId(response.confirmation.logs[0].value);
+            setIsDialogOpen(true);
+
         } catch (error) {
             console.error('Error creating event:', error);
             // Handle error (e.g., show error message to user)
@@ -127,6 +134,11 @@ const CreateEventForm: React.FC = () => {
                     </div>
                 </form>
             )}
+            <EventCreatedDialog
+                isOpen={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                eventId={createdEventId}
+            />
         </>
     );
 };

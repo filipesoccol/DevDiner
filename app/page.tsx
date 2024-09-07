@@ -64,7 +64,7 @@ export default async function Home() {
       <hr className='w-full border-solid border-orange border self-end' />
       <div className='flex flex-col w-100 gap-4 w-100  text-orange p-2 min-h-40 items-center' >
         <h1 className=''>Current {summary.total} tracked restrictions</h1>
-        <PieChart data={data} width={400} height={300} />
+        <PieChart data={data} total={summary.total} width={400} height={300} />
         <div className="mt-4 text-sm">
           <h5 className="font-semibold mb-2">Legend:</h5>
           <ul className="grid grid-cols-2 gap-2">
