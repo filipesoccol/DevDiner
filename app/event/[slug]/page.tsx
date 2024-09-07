@@ -7,7 +7,6 @@ import EventShareLink from '@/app/components/EventShareLink'
 import BarChart from '@/app/components/BarChart'
 import RestrictionLegend from '@/app/components/RestrictionLegend'
 
-
 interface EventProps {
     params: { slug: string }
 }

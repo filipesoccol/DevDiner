@@ -1,23 +1,11 @@
-import { getFrameMetadata } from 'frog/next'
-import type { Metadata } from 'next'
 import Image from 'next/image'
 
 import Link from 'next/link';
 import Footer from './components/Footer';
 import { getSummary } from './services/rollup';
 
-import { PieColors, RestrictionLabels } from './interfaces';
 import BarChart from './components/BarChart';
 import RestrictionLegend from './components/RestrictionLegend';
-
-export async function generateMetadata(): Promise<Metadata> {
-  const frameTags = await getFrameMetadata(
-    `${process.env.VERCEL_URL || 'http://localhost:3000'}/api`,
-  )
-  return {
-    other: frameTags,
-  }
-}
 
 export default async function Home() {
 

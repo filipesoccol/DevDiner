@@ -76,6 +76,7 @@ export type EventWithRestrictions = {
 
 // Function to get event information by slug
 export const getEventBySlug = async (slug: string) => {
+    console.log(`${process.env.NEXT_PUBLIC_ROLLUP_URL}/event/${slug}?${Date.now()}`);
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_ROLLUP_URL}/event/${slug}?${Date.now()}`, {
             method: 'GET',
