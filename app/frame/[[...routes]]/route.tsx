@@ -16,17 +16,6 @@ const app = new Frog<{ State: State }>({
   assetsPath: '/',
   basePath: '/frame',
   browserLocation: '/',
-  imageOptions: {
-    width: 600,
-    height: 320,
-    fonts: [
-      {
-        name: 'Bodoni Moda',
-        weight: 400,
-        source: 'google',
-      },
-    ],
-  },
   // Supply a Hub to enable frame verification.
   hub: neynar({ apiKey: 'NEYNAR_FROG_FM' }),
   title: 'Dev Diner Frame',
