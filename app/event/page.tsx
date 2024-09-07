@@ -1,18 +1,7 @@
-import { getFrameMetadata } from 'frog/next'
-import type { Metadata } from 'next'
 import Image from 'next/image'
 import CreateEventForm from '../components/CreateEventForm'
 import Link from 'next/link'
 import Footer from '../components/Footer'
-
-export async function generateMetadata(): Promise<Metadata> {
-    const frameTags = await getFrameMetadata(
-        `${process.env.VERCEL_URL || 'http://localhost:3000'}/api`,
-    )
-    return {
-        other: frameTags,
-    }
-}
 
 const CreateEvent = () => {
 

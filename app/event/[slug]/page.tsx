@@ -1,25 +1,12 @@
 import Footer from '@/app/components/Footer'
-import { getFrameMetadata } from 'frog/next'
-import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import DietaryRestrictionsForm from '@/app/components/DietaryRestrictionsForm'
 import { getEventBySlug } from '@/app/services/rollup'
-import PieChart from '@/app/components/PieChart'
-import { Restrictions } from '@/rollup/src/stackr/state';
-import { PieColors, RestrictionLabels } from '@/app/interfaces'
 import EventShareLink from '@/app/components/EventShareLink'
 import BarChart from '@/app/components/BarChart'
 import RestrictionLegend from '@/app/components/RestrictionLegend'
 
-export async function generateMetadata(): Promise<Metadata> {
-    const frameTags = await getFrameMetadata(
-        `${process.env.VERCEL_URL || 'http://localhost:3000'}/api`,
-    )
-    return {
-        other: frameTags,
-    }
-}
 
 interface EventProps {
     params: { slug: string }
