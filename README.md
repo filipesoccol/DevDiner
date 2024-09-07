@@ -4,6 +4,8 @@ A project to provide a survey application for collecting developers data related
 
 The stack includes Web3Auth for wallet authentication, XMTP tools for users to sign their submissions on Frames and a Micro-rollup backend using Stackr.
 
+Test our [LIVE DEMO](https://devdiner.filipe.contact/)
+
 ## Installation Front-end/Frames
 
 ```sh
