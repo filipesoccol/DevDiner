@@ -6,6 +6,9 @@ import Link from 'next/link'
 import DietaryRestrictionsForm from '@/app/components/DietaryRestrictionsForm'
 import { getEventBySlug } from '@/app/services/rollup'
 import PieChart from '@/app/components/PieChart'
+import { Restrictions } from '@/rollup/src/stackr/state';
+import { PieColors, RestrictionLabels } from '@/app/interfaces'
+import EventShareLink from '@/app/components/EventShareLink'
 
 export async function generateMetadata(): Promise<Metadata> {
     const frameTags = await getFrameMetadata(
@@ -24,10 +27,7 @@ async function Event({ params }: EventProps) {
     const { slug } = params;
     const event = await getEventBySlug(slug);
 
-    console.log(event)
-    const data = [20, 10, 15, 30, 5, 10, 5, 5];
-    const colors = ['#40AABF', '#8AB34C', '#D6BF29', '#DB4439', '#40AABF', '#8AB34C', '#D6BF29', '#DB4439'];
-    const labels = ['Gluten Free', 'Dairy Free', 'Sugar Free', 'Vegan', 'Kosher', 'Halal', 'Food allergies', 'Low Sodium'];
+    const data = Object.values(event.eventWithRestrictions.restrictionsSum);
 
     return (
         <div className="w-full flex flex-col p-4 gap-2">
@@ -39,19 +39,34 @@ async function Event({ params }: EventProps) {
                     height={50}
                     priority
                 /></Link>
-                <h2 className='border-b-2 border-orange self-end w-full text-right'>{event.eventWithRestrictions.name}</h2>
+                <h1 className='border-b-2 border-orange self-end w-full text-right text-xl'><b>{event.eventWithRestrictions.name}</b></h1>
             </div>
             <div className='flex flex-col bg-orange gap-4 w-100 p-6 items-center' >
                 <div className="text-center text-sm mb-4 text-beige">
-                    This event starts at: {new Date(event.eventWithRestrictions.startAt).toLocaleString()}, and ends at: {new Date(event.eventWithRestrictions.endAt).toLocaleString()}. Number of participants in this survey currently is {event.eventWithRestrictions.participants.length}. {event.eventWithRestrictions.cancelledAt ? `This event was cancelled on ${new Date(event.eventWithRestrictions.cancelledAt).toLocaleString()}.` : ''}
+                    This event starts at: {new Date(event.eventWithRestrictions.startAt).toLocaleString()}, and ends at: {new Date(event.eventWithRestrictions.endAt).toLocaleString()}. Number of participants in this survey currently is {event.eventWithRestrictions.participantCount}. {event.eventWithRestrictions.cancelledAt ? `This event was cancelled on ${new Date(event.eventWithRestrictions.cancelledAt).toLocaleString()}.` : ''}
                 </div>
-                <div>Select here your food restrictions and submit.</div>
+                <EventShareLink slug={slug} />
+                <div className='text-beige'>Select here your food restrictions and submit.</div>
                 <DietaryRestrictionsForm slug={slug} />
             </div>
             <hr className='w-full border-solid border-orange border self-end' />
-            <div className='flex flex-col bg-orange gap-4 w-100 p-6 items-center' >
+            <div className='flex flex-col bg-beige gap-4 w-100 p-6 items-center' >
                 <h4 className="text-xl font-semibold mb-2">Dietary Restrictions for this event</h4>
-                <PieChart data={data} colors={colors} labels={labels} width={600} height={400} />
+                <PieChart data={data} width={600} height={400} />
+                <div className="mt-4 text-sm">
+                    <h5 className="font-semibold mb-2">Legend:</h5>
+                    <ul className="grid grid-cols-2 gap-2">
+                        {RestrictionLabels.map((label, index) => (
+                            <li key={index} className="flex items-center">
+                                <span
+                                    className="inline-block w-4 h-4 mr-2"
+                                    style={{ backgroundColor: PieColors[index] }}
+                                ></span>
+                                {label}: {((data[index] / event.eventWithRestrictions.participantCount) * 100).toFixed(1)}%
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
             <hr className='w-full border-solid border-orange border self-end' />
             <Footer />

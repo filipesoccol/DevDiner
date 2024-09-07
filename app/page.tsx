@@ -5,6 +5,9 @@ import Image from 'next/image'
 import PieChart from './components/PieChart';
 import Link from 'next/link';
 import Footer from './components/Footer';
+import { getSummary } from './services/rollup';
+
+import { PieColors, RestrictionLabels } from './interfaces';
 
 export async function generateMetadata(): Promise<Metadata> {
   const frameTags = await getFrameMetadata(
@@ -15,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default function Home() {
+export default async function Home() {
 
   const randomImage = () => {
     const images = ['/image1.png', '/image2.png', '/image3.png', '/image4.png'];
@@ -23,11 +26,10 @@ export default function Home() {
     return `url(${images[randomIndex]})`;
   }
 
+  const { summary } = await getSummary();
   const backgroundImage = randomImage();
 
-  const data = [20, 10, 15, 30, 5, 10, 5, 5];
-  const colors = ['#40AABF', '#8AB34C', '#D6BF29', '#DB4439', '#40AABF', '#8AB34C', '#D6BF29', '#DB4439'];
-  const labels = ['Gluten Free', 'Dairy Free', 'Sugar Free', 'Vegan', 'Kosher', 'Halal', 'Food allergies', 'Low Sodium'];
+  const data = Object.values(summary.restrictionsSum);
 
   return (
     <div className="w-full flex flex-col p-4 gap-2">
@@ -61,8 +63,22 @@ export default function Home() {
       </div>
       <hr className='w-full border-solid border-orange border self-end' />
       <div className='flex flex-col w-100 gap-4 w-100  text-orange p-2 min-h-40 items-center' >
-        <h1 className=''>Current tracked restrictions</h1>
-        <PieChart data={data} colors={colors} labels={labels} width={400} height={300} />
+        <h1 className=''>Current {summary.total} tracked restrictions</h1>
+        <PieChart data={data} width={400} height={300} />
+        <div className="mt-4 text-sm">
+          <h5 className="font-semibold mb-2">Legend:</h5>
+          <ul className="grid grid-cols-2 gap-2">
+            {RestrictionLabels.map((label, index) => (
+              <li key={index} className="flex items-center">
+                <span
+                  className="inline-block w-4 h-4 mr-2"
+                  style={{ backgroundColor: PieColors[index] }}
+                ></span>
+                {label}: {((data[index] * 100) / summary.total).toFixed(1)}%
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
       <hr className='w-full border-solid border-orange border self-end' />
       <Footer />

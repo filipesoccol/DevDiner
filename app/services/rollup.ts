@@ -67,16 +67,10 @@ export type EventWithRestrictions = {
         endAt: number;
         cancelledAt: number;
         modifiedAt: number;
-        participants: string[];
         restrictionsSum: {
-            GLUTEN_FREE: number;
-            LACTOSE_FREE: number;
-            LOW_SUGAR: number;
-            LOW_SODIUM: number;
-            KOSHER: number;
-            HALAL: number;
-            FODMAPS: number;
+            [key: string]: number;
         };
+        participantCount: number;
     };
 };
 
@@ -97,6 +91,36 @@ export const getEventBySlug = async (slug: string) => {
         return await response.json() as EventWithRestrictions;
     } catch (error) {
         console.error(`Error fetching event with slug ${slug}:`, error);
+        throw error;
+    }
+};
+
+// Type definition for the summary data returned by getSummary
+export type SummaryData = {
+    success: boolean;
+    summary: {
+        total: number;
+        restrictionsSum: {
+            [key: string]: number;
+        };
+    };
+};
+
+// Function to get summary information related to entire database
+export const getSummary = async (): Promise<SummaryData> => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_ROLLUP_URL}/summary`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return await response.json() as SummaryData;
+    } catch (error) {
+        console.error('Error fetching summary:', error);
         throw error;
     }
 };

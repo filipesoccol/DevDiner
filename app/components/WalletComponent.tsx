@@ -1,14 +1,24 @@
-declare module 'react-jdenticon';
-
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { WalletContext } from "./WalletProvider";
 import Jdenticon from 'react-jdenticon';
 import { isAddress } from "ethers";
 
 const WalletComponent = () => {
-
     const [hovered, setHovered] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
     const wallet = useContext(WalletContext);
+
+    useEffect(() => {
+        if (wallet?.initialized !== undefined) {
+            setIsLoading(!wallet.initialized);
+        }
+    }, [wallet?.initialized]);
+
+    const handleLogin = async () => {
+        setIsLoading(true);
+        await wallet?.login();
+        setIsLoading(false);
+    };
 
     return (
         <>
@@ -34,7 +44,20 @@ const WalletComponent = () => {
                     </div>
                 </button>
             ) : (
-                <button className='special-button' onClick={() => wallet?.login()}>Login</button>
+                <button
+                    className='special-button flex items-center justify-center'
+                    onClick={handleLogin}
+                    disabled={isLoading}
+                >
+                    {isLoading ? (
+                        <>
+                            <span className="mr-2">Logging in...</span>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        </>
+                    ) : (
+                        'Login'
+                    )}
+                </button>
             )}
         </>
     )

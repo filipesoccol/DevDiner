@@ -10,12 +10,18 @@ const setMyRestrictions: STF<DevDinerState> = {
     if (!event.participants.find((p) => p === msgSender))
       event.participants.push(msgSender);
 
-    state.developers.push({
-      address: msgSender,
-      modifiedAt: inputs.timestamp,
-      restrictions: inputs.restrictions,
-    });
-    emit({ name: "Added Developer", value: msgSender });
+    const developer = state.developers.find((d) => d.address === msgSender);
+    if (!developer) {
+      state.developers.push({
+        address: msgSender,
+        modifiedAt: inputs.timestamp,
+        restrictions: inputs.restrictions,
+      })
+    } else {
+      developer.restrictions = inputs.restrictions;
+      developer.modifiedAt = inputs.timestamp;
+    }
+    emit({ name: "Updated Developer", value: msgSender });
     return state;
   },
 };

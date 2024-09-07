@@ -1,22 +1,25 @@
 "use client"
 
 import React from 'react';
+import { PieColors } from '@/app/interfaces';
 
 interface PieChartProps {
     data: number[];
-    colors: string[];
-    labels: string[];
     width?: number;
     height?: number;
 }
 
-const PieChart: React.FC<PieChartProps> = ({ data, colors, labels, width = 400, height = 400 }) => {
+const PieChart: React.FC<PieChartProps> = ({ data, width = 400, height = 400 }) => {
     const total = data.reduce((sum, value) => sum + value, 0);
     const radius = Math.min(width, height) / 2;
     const center = { x: width / 2, y: height / 2 };
 
     let startAngle = 0;
     const slices = data.map((value, index) => {
+        if (value === 0) {
+            return null; // Skip rendering for zero values
+        }
+
         const angle = (value / total) * 360;
         const endAngle = startAngle + angle;
 
@@ -34,8 +37,8 @@ const PieChart: React.FC<PieChartProps> = ({ data, colors, labels, width = 400, 
 
         startAngle = endAngle;
 
-        return <path key={index} d={d} fill={colors[index]} />;
-    });
+        return <path key={index} d={d} fill={PieColors[index]} />;
+    }).filter(Boolean); // Remove null values from the array
 
     return (
         <svg width={width} height={height}>

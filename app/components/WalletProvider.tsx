@@ -6,7 +6,6 @@ import { Web3Auth } from "@web3auth/modal";
 import RPC from "../services/EthersRPC";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { MetamaskAdapter } from "@web3auth/metamask-adapter";
-import { ActionSchema } from "@stackr/sdk";
 
 const clientId = process.env.NEXT_PUBLIC_WEB3_AUTH_CLIENTID || '';
 const privateKeyProvider = new EthereumPrivateKeyProvider({
@@ -35,8 +34,7 @@ interface WalletContextType {
     userInfo: Partial<UserInfo>;
     login: () => Promise<void>;
     logout: () => Promise<void>;
-    signTypedMessage: (messageType: ActionSchema, input: any) => Promise<string | undefined>;
-    sendTransaction: () => Promise<void>;
+    initialized: boolean; // Add this line
 }
 
 export const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -46,6 +44,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [account, setAccount] = useState<string>('');
     const [userInfo, setUserInfo] = useState<Partial<UserInfo>>({});
+    const [initialized, setInitialized] = useState(false);
 
     useEffect(() => {
         init();
@@ -56,10 +55,12 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
             await web3auth.initModal();
             setProvider(web3auth.provider);
             if (web3auth.connected && web3auth.provider) {
-                assignUserState();
+                await assignUserState();
             }
+            setInitialized(true);
         } catch (error) {
             console.error(error);
+            setInitialized(true);
         }
     };
 
@@ -85,22 +86,6 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         setUserInfo({});
     };
 
-    const sendTransaction = async () => {
-        if (!provider) {
-            return;
-        }
-        const transactionReceipt = await RPC.sendTransaction(provider);
-        return transactionReceipt;
-    };
-
-    const signTypedMessage = async (messageType: ActionSchema, input: any) => {
-        if (!provider) {
-            return;
-        }
-        const transactionReceipt = await RPC.signMessage(provider, messageType, input);
-        return transactionReceipt;
-    };
-
     return (
         <WalletContext.Provider value={{
             provider,
@@ -109,8 +94,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
             account,
             login,
             logout,
-            sendTransaction,
-            signTypedMessage
+            initialized // Add this line
         }}>
             {children}
         </WalletContext.Provider>

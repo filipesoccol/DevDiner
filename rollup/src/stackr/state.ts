@@ -1,15 +1,16 @@
 import { State } from "@stackr/sdk/machine";
-import { hexlify, keccak256, solidityPackedKeccak256, ZeroHash } from "ethers";
+import { solidityPackedKeccak256 } from "ethers";
 import { MerkleTree } from "merkletreejs";
 
 export enum Restrictions {
-  GLUTEN_FREE = 0b1,
-  LACTOSE_FREE = 0b1 << 1,
-  LOW_SUGAR = 0b1 << 2,
-  LOW_SODIUM = 0b1 << 3,
-  KOSHER = 0b1 << 4,
-  HALAL = 0b1 << 5,
-  FODMAPS = 0b1 << 6,
+  GlutenFree = 0b1,
+  DairyFree = 0b1 << 1,
+  SugarFree = 0b1 << 2,
+  LowSodium = 0b1 << 3,
+  Kosher = 0b1 << 4,
+  Halal = 0b1 << 5,
+  Vegan = 0b1 << 6,
+  Vegetarian = 0b1 << 7,
 }
 
 export type Developer = {
@@ -48,7 +49,6 @@ class DevDinerWrapper {
 
     this.merkletreeDevelopers = merkletreeDevelopers;
     this.merkletreeEvents = merkletreeEvents;
-
     this.events = events;
     this.developers = developers;
   }
@@ -99,10 +99,6 @@ export class DevDinerState extends State<DevDiner, DevDinerWrapper> {
   }
 
   getRootHash() {
-    // if (this.state.developers.length === 0 && this.state.events.length === 0) {
-    //   return ZeroHash;
-    // }
-    // return new MerkleTreeWrapper(this.state).merkleTree.getRoot();
     return solidityPackedKeccak256(
       ["bytes", "bytes"],
       [

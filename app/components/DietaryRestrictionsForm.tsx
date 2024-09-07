@@ -5,7 +5,7 @@ import { WalletContext } from './WalletProvider';
 import WalletComponent from './WalletComponent';
 import EthersRPC from '../services/EthersRPC';
 import { rollupPost } from '@/app/services/rollup';
-import { Restrictions } from '@/rollup/src/stackr/state';
+import { Restriction, RestrictionLabels } from '../interfaces';
 
 interface DietaryRestrictionsFormProps {
     slug: string;
@@ -15,11 +15,6 @@ const DietaryRestrictionsForm: React.FC<DietaryRestrictionsFormProps> = ({ slug 
     const wallet = useContext(WalletContext);
     const [selectedRestrictions, setSelectedRestrictions] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const restrictions = [
-        'Gluten Free', 'Dairy Free', 'Sugar Free', 'Vegan',
-        'Kosher', 'Halal', 'Food allergies', 'Low Sodium'
-    ];
 
     const handleRestrictionToggle = (restriction: string) => {
         setSelectedRestrictions(prev =>
@@ -40,13 +35,14 @@ const DietaryRestrictionsForm: React.FC<DietaryRestrictionsFormProps> = ({ slug 
             // Encode restrictions to binary
             const encodedRestrictions = selectedRestrictions.reduce((acc, restriction) => {
                 switch (restriction) {
-                    case 'Gluten Free': return acc | Restrictions.GLUTEN_FREE;
-                    case 'Dairy Free': return acc | Restrictions.LACTOSE_FREE;
-                    case 'Sugar Free': return acc | Restrictions.LOW_SUGAR;
-                    case 'Low Sodium': return acc | Restrictions.LOW_SODIUM;
-                    case 'Kosher': return acc | Restrictions.KOSHER;
-                    case 'Halal': return acc | Restrictions.HALAL;
-                    case 'Food allergies': return acc | Restrictions.FODMAPS;
+                    case Restriction.GlutenFree: return acc | (1 << 0);
+                    case Restriction.DairyFree: return acc | (1 << 1);
+                    case Restriction.SugarFree: return acc | (1 << 2);
+                    case Restriction.LowSodium: return acc | (1 << 3);
+                    case Restriction.Kosher: return acc | (1 << 4);
+                    case Restriction.Halal: return acc | (1 << 5);
+                    case Restriction.Vegan: return acc | (1 << 6);
+                    case Restriction.Vegetarian: return acc | (1 << 7);
                     default: return acc;
                 }
             }, 0);
@@ -79,25 +75,26 @@ const DietaryRestrictionsForm: React.FC<DietaryRestrictionsFormProps> = ({ slug 
         <>
             <WalletComponent />
             {wallet?.loggedIn && (
-                <form onSubmit={handleSubmit} className='flex flex-col gap-4 w-full animate-in fade-in zoom-in'>
-                    <div className='flex flex-wrap gap-2'>
-                        {restrictions.map((restriction) => (
-                            <button
-                                key={restriction}
-                                type="button"
-                                onClick={() => handleRestrictionToggle(restriction)}
-                                className={`p-2 rounded-md ${selectedRestrictions.includes(restriction)
-                                    ? 'bg-green text-white'
-                                    : 'bg-beige text-black'
-                                    }`}
-                            >
-                                {restriction}
-                            </button>
-                        ))}
+                <form onSubmit={handleSubmit} className='flex flex-col gap-4 w-full max-w-md mx-auto animate-in fade-in zoom-in'>
+                    <div className='p-6 rounded-lg'>
+                        <div className='space-y-2'>
+                            {RestrictionLabels.map((restriction) => (
+                                <div key={restriction} className='flex items-center justify-between'>
+                                    <span className='text-lg text-beige'>{restriction}</span>
+                                    <div className='flex-grow mx-2 border-b border-dotted border-gray-300'></div>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedRestrictions.includes(restriction)}
+                                        onChange={() => handleRestrictionToggle(restriction)}
+                                        className='form-checkbox h-5 w-5 text-green'
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                     <button
                         type="submit"
-                        className='special-button flex items-center justify-center'
+                        className='special-button flex items-center justify-center mt-4'
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? (

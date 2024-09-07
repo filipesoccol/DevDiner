@@ -79,6 +79,50 @@ app.post("/submit-action/:schemaName", async (req: Request, res: Response) => {
   }
 });
 
+app.get("/summary", async (_req: Request, res: Response) => {
+  try {
+    if (!state || !state.state || !state.state.developers) {
+      return res.status(500).json({ success: false, error: "State is not initialized" });
+    }
+
+    const developers = state.state.developers;
+    const total = developers.length;
+
+    const restrictionsSum = developers.reduce((sum, dev) => {
+      return {
+        GlutenFree: sum.GlutenFree + (dev.restrictions & Restrictions.GlutenFree ? 1 : 0),
+        DairyFree: sum.DairyFree + (dev.restrictions & Restrictions.DairyFree ? 1 : 0),
+        SugarFree: sum.SugarFree + (dev.restrictions & Restrictions.SugarFree ? 1 : 0),
+        LowSodium: sum.LowSodium + (dev.restrictions & Restrictions.LowSodium ? 1 : 0),
+        Kosher: sum.Kosher + (dev.restrictions & Restrictions.Kosher ? 1 : 0),
+        Halal: sum.Halal + (dev.restrictions & Restrictions.Halal ? 1 : 0),
+        Vegan: sum.Vegan + (dev.restrictions & Restrictions.Vegan ? 1 : 0),
+        Vegetarian: sum.Vegetarian + (dev.restrictions & Restrictions.Vegetarian ? 1 : 0),
+      };
+    }, {
+      GlutenFree: 0,
+      DairyFree: 0,
+      SugarFree: 0,
+      LowSodium: 0,
+      Kosher: 0,
+      Halal: 0,
+      Vegan: 0,
+      Vegetarian: 0,
+    });
+
+    const summary = {
+      total,
+      restrictionsSum,
+    };
+
+    return res.status(200).json({ success: true, summary });
+  } catch (error) {
+    console.error("Error fetching summary:", error);
+    return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+
+
 app.get("/event/:slug", async (req: Request, res: Response) => {
   try {
     const { slug } = req.params;
@@ -97,28 +141,40 @@ app.get("/event/:slug", async (req: Request, res: Response) => {
       .filter(dev => event.participants.includes(dev.address))
       .reduce((sum, dev) => {
         return {
-          GLUTEN_FREE: sum.GLUTEN_FREE + (dev.restrictions & Restrictions.GLUTEN_FREE ? 1 : 0),
-          LACTOSE_FREE: sum.LACTOSE_FREE + (dev.restrictions & Restrictions.LACTOSE_FREE ? 1 : 0),
-          LOW_SUGAR: sum.LOW_SUGAR + (dev.restrictions & Restrictions.LOW_SUGAR ? 1 : 0),
-          LOW_SODIUM: sum.LOW_SODIUM + (dev.restrictions & Restrictions.LOW_SODIUM ? 1 : 0),
-          KOSHER: sum.KOSHER + (dev.restrictions & Restrictions.KOSHER ? 1 : 0),
-          HALAL: sum.HALAL + (dev.restrictions & Restrictions.HALAL ? 1 : 0),
-          FODMAPS: sum.FODMAPS + (dev.restrictions & Restrictions.FODMAPS ? 1 : 0),
+          GlutenFree: sum.GlutenFree + (dev.restrictions & Restrictions.GlutenFree ? 1 : 0),
+          DairyFree: sum.DairyFree + (dev.restrictions & Restrictions.DairyFree ? 1 : 0),
+          SugarFree: sum.SugarFree + (dev.restrictions & Restrictions.SugarFree ? 1 : 0),
+          LowSodium: sum.LowSodium + (dev.restrictions & Restrictions.LowSodium ? 1 : 0),
+          Kosher: sum.Kosher + (dev.restrictions & Restrictions.Kosher ? 1 : 0),
+          Halal: sum.Halal + (dev.restrictions & Restrictions.Halal ? 1 : 0),
+          Vegan: sum.Vegan + (dev.restrictions & Restrictions.Vegan ? 1 : 0),
+          Vegetarian: sum.Vegetarian + (dev.restrictions & Restrictions.Vegetarian ? 1 : 0),
         };
       }, {
-        GLUTEN_FREE: 0,
-        LACTOSE_FREE: 0,
-        LOW_SUGAR: 0,
-        LOW_SODIUM: 0,
-        KOSHER: 0,
-        HALAL: 0,
-        FODMAPS: 0,
+        GlutenFree: 0,
+        DairyFree: 0,
+        SugarFree: 0,
+        LowSodium: 0,
+        Kosher: 0,
+        Halal: 0,
+        Vegan: 0,
+        Vegetarian: 0,
       });
 
+    // Calculate the total number of participants
+    const participantCount = event.participants.length;
+
+    // Remove the participants array from the event object
+    const { participants, ...eventWithoutParticipants } = event;
+
+    // Create the event object with restrictions sum and participant count
     const eventWithRestrictions = {
-      ...event,
+      ...eventWithoutParticipants,
       restrictionsSum,
+      participantCount,
     };
+
+    console.log(eventWithRestrictions)
     return res.status(200).json({ success: true, eventWithRestrictions });
   } catch (error) {
     console.error(`Error fetching event with slug ${req.params.slug}:`, error);
