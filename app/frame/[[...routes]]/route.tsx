@@ -17,12 +17,15 @@ const app = new Frog<{ State: State }>({
   basePath: '/frame',
   browserLocation: '/',
   imageOptions: {
-    fonts: [{
-      name: 'Bodoni Moda',
-      weight: 400,
-      style: 'normal',
-      source: 'google',
-    }]
+    width: 600,
+    height: 320,
+    fonts: [
+      {
+        name: 'Bodoni Moda',
+        weight: 400,
+        source: 'google',
+      },
+    ],
   },
   // Supply a Hub to enable frame verification.
   hub: neynar({ apiKey: 'NEYNAR_FROG_FM' }),
@@ -42,8 +45,8 @@ app.frame('/:slug', async (c) => {
   return c.res({
     image: (
       <div style={{ background: '#F1E7DB', color: '#2C263D', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontSize: 40, padding: 40, height: '100%' }}>
-        <div style={{ display: 'flex' }}>Come join {data.name}!</div>
-        <div style={{ display: 'flex', fontSize: 30 }}>Survey participants: {data.participantCount}</div>
+        <div style={{ display: 'flex' }}>{data.name}</div>
+        <div style={{ display: 'flex', fontSize: 30 }}>Participants: {data.participantCount}</div>
         <div style={{ display: 'flex', flexDirection: 'row', width: '90%', height: '400px', justifyContent: 'flex-start', paddingTop: 40 }}>
           <div style={{ display: 'flex', flexDirection: 'column', width: '10%', height: '500px', justifyContent: 'flex-start', alignItems: 'flex-end' }}>
             {Object.entries(data.restrictionsSum).map(([restriction, count]) => (
