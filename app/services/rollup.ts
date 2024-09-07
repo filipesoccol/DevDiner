@@ -77,7 +77,7 @@ export type EventWithRestrictions = {
 // Function to get event information by slug
 export const getEventBySlug = async (slug: string) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_ROLLUP_URL}/event/${slug}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_ROLLUP_URL}/event/${slug}?${Date.now()}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -109,13 +109,14 @@ export type SummaryData = {
 // Function to get summary information related to entire database
 export const getSummary = async (): Promise<SummaryData> => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_ROLLUP_URL}/summary`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_ROLLUP_URL}/summary?${Date.now() / 1000}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
         });
         if (!response.ok) {
+
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return await response.json() as SummaryData;
