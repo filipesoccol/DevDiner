@@ -10,7 +10,7 @@ const main = async () => {
   mru.init()
 
   // Create a random wallet
-  const wallets = new Array(2).fill(0).map(() => Wallet.createRandom());
+  const wallets = new Array(100).fill(0).map(() => Wallet.createRandom());
 
   for (const e of ['My Nice Event', 'My Nice Event 2', 'My Nice Event 3']) {
     const inputs = {
@@ -35,7 +35,7 @@ const main = async () => {
   for (const w of wallets) {
     const inputs = {
       event: 'my-nice-event',
-      restrictions: 64, // Math.floor(Math.random() * 64),
+      restrictions: Math.floor(Math.random() * 129),
       timestamp: nonce++,
     };
 

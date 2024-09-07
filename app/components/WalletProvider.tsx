@@ -73,9 +73,9 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         if (!web3auth.connected) return
         if (!web3auth.provider) return
         setProvider(web3auth.provider);
-        setLoggedIn(true);
         setUserInfo(await web3auth.getUserInfo())
         setAccount(await RPC.getAccounts(web3auth.provider))
+        setLoggedIn(true);
     }
 
     const logout = async () => {

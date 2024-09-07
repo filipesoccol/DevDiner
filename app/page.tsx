@@ -44,10 +44,6 @@ export default async function Home() {
               <button className='special-button'>Create an Event</button>
             </div>
           </Link>
-          <div className='bg-black rounded-full pb-2'>
-            <button className='special-button'>Browse</button>
-          </div>
-
         </div>
       </div>
       <hr className='w-full border-solid border-orange border self-end' />

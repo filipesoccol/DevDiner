@@ -17,6 +17,7 @@ const DietaryRestrictionsForm: React.FC<DietaryRestrictionsFormProps> = ({ slug 
     const [selectedRestrictions, setSelectedRestrictions] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [error, setError] = useState('');
 
     const handleRestrictionToggle = (restriction: string) => {
         setSelectedRestrictions(prev =>
@@ -67,7 +68,7 @@ const DietaryRestrictionsForm: React.FC<DietaryRestrictionsFormProps> = ({ slug 
             setShowConfirmation(true);
         } catch (error) {
             console.error('Error submitting dietary restrictions:', error);
-            // Handle error (e.g., show error message to user)
+            setError('Error submitting dietary restrictions. Please try again.')
         } finally {
             setIsSubmitting(false);
         }
@@ -94,20 +95,27 @@ const DietaryRestrictionsForm: React.FC<DietaryRestrictionsFormProps> = ({ slug 
                             ))}
                         </div>
                     </div>
-                    <button
-                        type="submit"
-                        className='special-button flex items-center justify-center mt-4'
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <span className="mr-2">Submitting...</span>
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                            </>
-                        ) : (
-                            'Submit Dietary Restrictions'
+                    <div className='flex gap-6'>
+                        <button
+                            type="submit"
+                            className='special-button flex items-center justify-center mt-4'
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <span className="mr-2">Submitting...</span>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                </>
+                            ) : (
+                                'Submit Dietary Restrictions'
+                            )}
+                        </button>
+                        {error && (
+                            <div className="text-beige text-xs rounded p-2 max-w-60 animate-pulse">
+                                {error}
+                            </div>
                         )}
-                    </button>
+                    </div>
                 </form>
             )}
             <ConfirmationDialog

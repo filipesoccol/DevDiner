@@ -18,10 +18,11 @@ const CreateEventForm: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [createdEventId, setCreatedEventId] = useState('');
+    const [error, setError] = useState('');
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-        console.log(formData)
+        setError('')
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +58,7 @@ const CreateEventForm: React.FC = () => {
 
         } catch (error) {
             console.error('Error creating event:', error);
-            // Handle error (e.g., show error message to user)
+            setError('Error creating event. Please try again with a different name.')
         } finally {
             setIsSubmitting(false);
         }
@@ -128,9 +129,14 @@ const CreateEventForm: React.FC = () => {
                                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                                 </>
                             ) : (
-                                'Create Event Survey'
+                                error ? 'Retry' : 'Create Event Survey'
                             )}
                         </button>
+                        {error && (
+                            <div className="text-beige text-xs rounded p-2 max-w-60 animate-pulse">
+                                {error}
+                            </div>
+                        )}
                     </div>
                 </form>
             )}
