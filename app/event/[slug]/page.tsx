@@ -6,6 +6,7 @@ import { getEventBySlug } from '@/app/services/rollup'
 import EventShareLink from '@/app/components/EventShareLink'
 import BarChart from '@/app/components/BarChart'
 import RestrictionLegend from '@/app/components/RestrictionLegend'
+import { redirect } from 'next/navigation'
 
 interface EventProps {
     params: { slug: string }
@@ -13,9 +14,15 @@ interface EventProps {
 
 async function Event({ params }: EventProps) {
     const { slug } = params;
-    const event = await getEventBySlug(slug);
-
-    const data = Object.values(event.eventWithRestrictions.restrictionsSum);
+    let event;
+    let data;
+    try {
+        event = await getEventBySlug(slug);
+        data = Object.values(event.eventWithRestrictions.restrictionsSum);
+    } catch (error) {
+        console.error("Error fetching event:", error);
+        return redirect('/');
+    }
 
     return (
         <div className="w-full flex flex-col p-4 gap-2">
