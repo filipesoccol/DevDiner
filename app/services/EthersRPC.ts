@@ -3,12 +3,12 @@ import { CHAIN_NAMESPACES, type IProvider } from "@web3auth/base";
 import { BigNumberish, ethers } from "ethers";
 
 // Copy from Stackr.config.js
-const domain = {
+export const domain = {
     name: "DevDiner v0",
     version: "1",
     chainId: 11155111,
-    verifyingContract: "0x0000000000000000000000000000000000000000",
-    salt: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    verifyingContract: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+    salt: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" as `0x${string}`,
 }
 
 const chainConfig = {

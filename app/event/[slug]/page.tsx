@@ -10,6 +10,7 @@ import { Restrictions } from '@/rollup/src/stackr/state';
 import { PieColors, RestrictionLabels } from '@/app/interfaces'
 import EventShareLink from '@/app/components/EventShareLink'
 import BarChart from '@/app/components/BarChart'
+import RestrictionLegend from '@/app/components/RestrictionLegend'
 
 export async function generateMetadata(): Promise<Metadata> {
     const frameTags = await getFrameMetadata(
@@ -51,21 +52,8 @@ async function Event({ params }: EventProps) {
             <hr className='w-full border-solid border-orange border self-end' />
             <div className='flex flex-col bg-beige gap-4 w-100 p-6 items-center' >
                 <h4 className="text-xl font-semibold mb-2">Dietary Restrictions for {event.eventWithRestrictions.participantCount} participants</h4>
-                <BarChart data={data} total={event.eventWithRestrictions.participantCount} width={350} height={350} />
-                <div className="mt-4 text-sm">
-                    <h5 className="font-semibold mb-2">Legend:</h5>
-                    <ul className="grid grid-cols-2 gap-2">
-                        {RestrictionLabels.map((label, index) => (
-                            <li key={index} className="flex items-center">
-                                <span
-                                    className="inline-block w-4 h-4 mr-2"
-                                    style={{ backgroundColor: PieColors[index] }}
-                                ></span>
-                                {label}: {((data[index] / event.eventWithRestrictions.participantCount) * 100).toFixed(1)}%
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                <BarChart data={data} total={event.eventWithRestrictions.participantCount} />
+                <RestrictionLegend data={data} total={event.eventWithRestrictions.participantCount} />
             </div>
             <hr className='w-full border-solid border-orange border self-end' />
             <div className='flex flex-col bg-orange gap-4 w-100 p-6 items-center' >

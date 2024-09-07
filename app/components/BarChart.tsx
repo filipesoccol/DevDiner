@@ -6,68 +6,38 @@ import { PieColors } from '@/app/interfaces';
 interface BarChartProps {
     data: number[];
     total: number;
-    width?: number;
-    height?: number;
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data, total, width = 350, height = 350 }) => {
-    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
-    const chartWidth = width - margin.left - margin.right;
-    const chartHeight = height - margin.top - margin.bottom;
+const BarChart: React.FC<BarChartProps> = ({ data, total }) => {
+    const hasNonZeroValue = data.some(value => value > 0);
 
-    const barWidth = chartWidth / data.length;
+    if (!hasNonZeroValue) {
+        return <div className="text-center text-gray-500">No sufficient data available to show chart.</div>;
+    }
 
     const maxValue = Math.max(...data);
-    const yScale = (value: number) => (value / maxValue) * chartHeight;
-
-    const bars = data.map((value, index) => {
-        const barHeight = yScale(value);
-        const x = margin.left + index * barWidth;
-        const y = height - margin.bottom - barHeight;
-        const percentage = ((value / total) * 100).toFixed(1);
-
-        return (
-            <g key={index}>
-                <rect
-                    x={x}
-                    y={y}
-                    width={barWidth - 2}
-                    height={barHeight}
-                    fill={PieColors[index]}
-                />
-                <text
-                    x={x + barWidth / 2}
-                    y={y - 5}
-                    textAnchor="middle"
-                    fontSize="10"
-                    fill="black"
-                >
-                    {percentage}%
-                </text>
-            </g>
-        );
-    });
 
     return (
-        <svg width={width} height={height}>
-            {bars}
-            {/* X-axis */}
-            <line
-                x1={margin.left}
-                y1={height - margin.bottom}
-                x2={width - margin.right}
-                y2={height - margin.bottom}
-                stroke="black"
-            />
-            {/* Y-axis */}
-            <line
-                x1={margin.left}
-                y1={margin.top}
-                x2={margin.left}
-                y2={height - margin.bottom}
-                stroke="black"
-            />
-        </svg>
+        <div className="w-80 h-64 flex items-end justify-between space-x-2 animate-in zoom-in fade-in">
+            {data.map((value, index) => {
+                const percentage = ((value / total) * 100).toFixed(1);
+                const height = `${Math.max((value / maxValue) * 100, 1)}%`;
+
+                return (
+                    <div key={index} className="flex flex-col items-center justify-end h-full">
+                        <div className="text-xs mb-1">{percentage}%</div>
+                        <div
+                            className="w-8 rounded-t-md transition-all duration-300 ease-in-out"
+                            style={{
+                                height: height,
+                                backgroundColor: PieColors[index],
+                                minHeight: '4px',
+                            }}
+                        ></div>
+                    </div>
+                );
+            })}
+        </div>
     );
 };
 

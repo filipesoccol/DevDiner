@@ -2,12 +2,13 @@ import { getFrameMetadata } from 'frog/next'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 
-import PieChart from './components/PieChart';
 import Link from 'next/link';
 import Footer from './components/Footer';
 import { getSummary } from './services/rollup';
 
 import { PieColors, RestrictionLabels } from './interfaces';
+import BarChart from './components/BarChart';
+import RestrictionLegend from './components/RestrictionLegend';
 
 export async function generateMetadata(): Promise<Metadata> {
   const frameTags = await getFrameMetadata(
@@ -64,21 +65,8 @@ export default async function Home() {
       <hr className='w-full border-solid border-orange border self-end' />
       <div className='flex flex-col w-100 gap-4 w-100  text-orange p-2 min-h-40 items-center' >
         <h1 className=''>Current {summary.total} tracked restrictions</h1>
-        <PieChart data={data} total={summary.total} width={400} height={300} />
-        <div className="mt-4 text-sm">
-          <h5 className="font-semibold mb-2">Legend:</h5>
-          <ul className="grid grid-cols-2 gap-2">
-            {RestrictionLabels.map((label, index) => (
-              <li key={index} className="flex items-center">
-                <span
-                  className="inline-block w-4 h-4 mr-2"
-                  style={{ backgroundColor: PieColors[index] }}
-                ></span>
-                {label}: {((data[index] * 100) / summary.total).toFixed(1)}%
-              </li>
-            ))}
-          </ul>
-        </div>
+        <BarChart data={data} total={summary.total} />
+        <RestrictionLegend data={data} total={summary.total} />
       </div>
       <hr className='w-full border-solid border-orange border self-end' />
       <Footer />
